@@ -16,19 +16,31 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // One-to-One relationship between Employee and Salary
+        modelBuilder.Entity<Employee>()
+            .HasOne(e => e.Salary)
+            .WithOne(s => s.Employee)
+            .HasForeignKey<Salary>(s => s.EmployeeId);
+
+        // One-to-Many relationship between Department and Employee
+        modelBuilder.Entity<Employee>()
+            .HasOne(e => e.Department)
+            .WithMany(d => d.Employees)
+            .HasForeignKey(e => e.DepartmentId);
+
+        // Many-to-Many relationship between Project and Employee
         modelBuilder.Entity<ProjectEmployee>()
             .HasKey(pe => new { pe.ProjectId, pe.EmployeeId });
-
         modelBuilder.Entity<ProjectEmployee>()
             .HasOne(pe => pe.Project)
             .WithMany(p => p.ProjectEmployees)
             .HasForeignKey(pe => pe.ProjectId);
-
         modelBuilder.Entity<ProjectEmployee>()
             .HasOne(pe => pe.Employee)
             .WithMany(e => e.ProjectEmployees)
             .HasForeignKey(pe => pe.EmployeeId);
 
+        // Seeding data
         modelBuilder.Entity<Department>().HasData(
         new Department { Id = Guid.NewGuid(), Name = "Software Development" },
         new Department { Id = Guid.NewGuid(), Name = "Finance" },
