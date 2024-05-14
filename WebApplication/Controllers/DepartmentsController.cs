@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebAppication.DTOs;
 using WebAppication.Models;
 
 namespace WebApplication.Controllers
@@ -22,14 +23,16 @@ namespace WebApplication.Controllers
 
         // GET: api/Departments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
+        public async Task<ActionResult<IEnumerable<DepartmentDTO>>> GetDepartments()
         {
-            return await _context.Departments.ToListAsync();
+            return await _context.Departments
+                .Select(d => new DepartmentDTO { Name = d.Name }) // Map Department to DepartmentDTO
+                .ToListAsync();
         }
 
         // GET: api/Departments/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Department>> GetDepartment(Guid id)
+        public async Task<ActionResult<DepartmentDTO>> GetDepartment(Guid id)
         {
             var department = await _context.Departments.FindAsync(id);
 
@@ -38,18 +41,23 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            return department;
+            var departmentDto = new DepartmentDTO { Name = department.Name }; // Map Department to DepartmentDTO
+
+            return departmentDto;
         }
 
         // PUT: api/Departments/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutDepartment(Guid id, Department department)
+        public async Task<IActionResult> PutDepartment(Guid id, DepartmentDTO departmentDto)
         {
-            if (id != department.Id)
+            var department = await _context.Departments.FindAsync(id);
+            if (department == null)
             {
-                return BadRequest();
+                return NotFound();
             }
+
+            department.Name = departmentDto.Name; // Map DepartmentDTO to Department
 
             _context.Entry(department).State = EntityState.Modified;
 
@@ -75,12 +83,14 @@ namespace WebApplication.Controllers
         // POST: api/Departments
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Department>> PostDepartment(Department department)
+        public async Task<ActionResult<DepartmentDTO>> PostDepartment(DepartmentDTO departmentDto)
         {
+            var department = new Department { Name = departmentDto.Name }; // Map DepartmentDTO to Department
+
             _context.Departments.Add(department);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDepartment", new { id = department.Id }, department);
+            return CreatedAtAction("GetDepartment", new { id = department.Id }, new DepartmentDTO { Name = department.Name }); // Return DepartmentDTO
         }
 
         // DELETE: api/Departments/5
