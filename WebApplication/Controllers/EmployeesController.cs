@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebAppication.DTOs;
 using WebAppication.Models;
 
 namespace WebApplication.Controllers
@@ -22,14 +23,16 @@ namespace WebApplication.Controllers
 
         // GET: api/Employees
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<EmployeeDTO>>> GetEmployees()
         {
-            return await _context.Employees.ToListAsync();
+            return await _context.Employees
+                .Select(e => new EmployeeDTO { Name = e.Name }) // Map Employee to EmployeeDTO
+                .ToListAsync();
         }
 
         // GET: api/Employees/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(Guid id)
+        public async Task<ActionResult<EmployeeDTO>> GetEmployee(Guid id)
         {
             var employee = await _context.Employees.FindAsync(id);
 
@@ -38,18 +41,23 @@ namespace WebApplication.Controllers
                 return NotFound();
             }
 
-            return employee;
+            var employeeDto = new EmployeeDTO { Name = employee.Name }; // Map Employee to EmployeeDTO
+
+            return employeeDto;
         }
 
         // PUT: api/Employees/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(Guid id, Employee employee)
+        public async Task<IActionResult> PutEmployee(Guid id, EmployeeDTO employeeDto)
         {
-            if (id != employee.Id)
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee == null)
             {
-                return BadRequest();
+                return NotFound();
             }
+
+            employee.Name = employeeDto.Name; // Map EmployeeDTO to Employee
 
             _context.Entry(employee).State = EntityState.Modified;
 
@@ -75,12 +83,14 @@ namespace WebApplication.Controllers
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
+        public async Task<ActionResult<EmployeeDTO>> PostEmployee(EmployeeDTO employeeDto)
         {
+            var employee = new Employee { Name = employeeDto.Name }; // Map EmployeeDTO to Employee
+
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
+            return CreatedAtAction("GetEmployee", new { id = employee.Id }, new EmployeeDTO { Name = employee.Name }); // Return EmployeeDTO
         }
 
         // DELETE: api/Employees/5
