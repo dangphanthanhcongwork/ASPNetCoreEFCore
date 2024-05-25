@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace WebApplication.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class UpdateSeedData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -62,7 +60,9 @@ namespace WebApplication.Migrations
                 columns: table => new
                 {
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    EmployeeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Enable = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -98,17 +98,6 @@ namespace WebApplication.Migrations
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.InsertData(
-                table: "Departments",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
-                {
-                    { new Guid("13bf4491-11c5-4cc9-9bc5-079c54bd3803"), "Finance" },
-                    { new Guid("57cd7cc7-e640-4f60-80e3-7fbed854b232"), "HR" },
-                    { new Guid("9ec7b307-97d0-4ead-8877-a1ce15826a42"), "Software Development" },
-                    { new Guid("a1f48c1b-cd75-4d9b-9dcc-4287700602b5"), "Accountant" }
                 });
 
             migrationBuilder.CreateIndex(

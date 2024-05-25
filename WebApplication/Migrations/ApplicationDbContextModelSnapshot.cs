@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using WebApplication.Data;
 
 #nullable disable
 
@@ -16,12 +17,12 @@ namespace WebApplication.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("WebAppication.Models.Department", b =>
+            modelBuilder.Entity("WebApplication.Models.Department", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,31 +36,9 @@ namespace WebApplication.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Departments");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("9ec7b307-97d0-4ead-8877-a1ce15826a42"),
-                            Name = "Software Development"
-                        },
-                        new
-                        {
-                            Id = new Guid("13bf4491-11c5-4cc9-9bc5-079c54bd3803"),
-                            Name = "Finance"
-                        },
-                        new
-                        {
-                            Id = new Guid("a1f48c1b-cd75-4d9b-9dcc-4287700602b5"),
-                            Name = "Accountant"
-                        },
-                        new
-                        {
-                            Id = new Guid("57cd7cc7-e640-4f60-80e3-7fbed854b232"),
-                            Name = "HR"
-                        });
                 });
 
-            modelBuilder.Entity("WebAppication.Models.Employee", b =>
+            modelBuilder.Entity("WebApplication.Models.Employee", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -83,7 +62,7 @@ namespace WebApplication.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("WebAppication.Models.Project", b =>
+            modelBuilder.Entity("WebApplication.Models.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -99,12 +78,18 @@ namespace WebApplication.Migrations
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("WebAppication.Models.ProjectEmployee", b =>
+            modelBuilder.Entity("WebApplication.Models.ProjectEmployee", b =>
                 {
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Enable")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ProjectId", "EmployeeId");
@@ -114,7 +99,7 @@ namespace WebApplication.Migrations
                     b.ToTable("ProjectEmployees");
                 });
 
-            modelBuilder.Entity("WebAppication.Models.Salary", b =>
+            modelBuilder.Entity("WebApplication.Models.Salary", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -134,9 +119,9 @@ namespace WebApplication.Migrations
                     b.ToTable("Salaries");
                 });
 
-            modelBuilder.Entity("WebAppication.Models.Employee", b =>
+            modelBuilder.Entity("WebApplication.Models.Employee", b =>
                 {
-                    b.HasOne("WebAppication.Models.Department", "Department")
+                    b.HasOne("WebApplication.Models.Department", "Department")
                         .WithMany("Employees")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -145,15 +130,15 @@ namespace WebApplication.Migrations
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("WebAppication.Models.ProjectEmployee", b =>
+            modelBuilder.Entity("WebApplication.Models.ProjectEmployee", b =>
                 {
-                    b.HasOne("WebAppication.Models.Employee", "Employee")
+                    b.HasOne("WebApplication.Models.Employee", "Employee")
                         .WithMany("ProjectEmployees")
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebAppication.Models.Project", "Project")
+                    b.HasOne("WebApplication.Models.Project", "Project")
                         .WithMany("ProjectEmployees")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -164,23 +149,23 @@ namespace WebApplication.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("WebAppication.Models.Salary", b =>
+            modelBuilder.Entity("WebApplication.Models.Salary", b =>
                 {
-                    b.HasOne("WebAppication.Models.Employee", "Employee")
+                    b.HasOne("WebApplication.Models.Employee", "Employee")
                         .WithOne("Salary")
-                        .HasForeignKey("WebAppication.Models.Salary", "EmployeeId")
+                        .HasForeignKey("WebApplication.Models.Salary", "EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("WebAppication.Models.Department", b =>
+            modelBuilder.Entity("WebApplication.Models.Department", b =>
                 {
                     b.Navigation("Employees");
                 });
 
-            modelBuilder.Entity("WebAppication.Models.Employee", b =>
+            modelBuilder.Entity("WebApplication.Models.Employee", b =>
                 {
                     b.Navigation("ProjectEmployees");
 
@@ -188,7 +173,7 @@ namespace WebApplication.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebAppication.Models.Project", b =>
+            modelBuilder.Entity("WebApplication.Models.Project", b =>
                 {
                     b.Navigation("ProjectEmployees");
                 });
